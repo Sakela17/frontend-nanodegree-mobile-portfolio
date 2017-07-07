@@ -4,6 +4,8 @@
 var gulp = require('gulp');
 //var rename = require("gulp-rename"); need to install
 var uglify = require('gulp-uglify');
+var pump = require('pump');
+var htmlmin = require('gulp-htmlmin');
 var minify = require('gulp-clean-css');
 //const imagemin = require('gulp-imagemin');
 const image = require('gulp-image');
@@ -19,6 +21,22 @@ const image = require('gulp-image');
 //         .pipe(imagemin())
 //         .pipe(gulp.dest('dist/img'));
 // });
+
+gulp.task('min-html', function() {
+    return gulp.src('./*.html')
+        .pipe(htmlmin({collapseWhitespace: true}))
+        .pipe(gulp.dest('dist'));
+});
+
+gulp.task('min-js', function (cb) {
+    pump([
+            gulp.src('./js/*.js'),
+            uglify(),
+            gulp.dest('dist/js')
+        ],
+        cb
+    );
+});
 
 gulp.task('min-img', function () {
     gulp.src('./img/*')
