@@ -490,11 +490,23 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  var items = document.querySelectorAll('.mover');
+  var movers = document.querySelectorAll('.mover');
+  var length = movers.length;
+  // var phase = [];
+  //
+  // for(var n = 0; n < 5; n += 1) {
+  //     var item = Math.sin((document.body.scrollTop / 1250) + (n % 5));
+  //     phase.push(item);
+  // }
+  //
+  //
 
-  for (var i = 0; i < items.length; i++) {
+
+  for (var i = 0; i < length; i += 1) {
     var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
-    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+    console.log(phase);
+    console.log(movers[i].basicLeft + 100 * phase + 'px');
+    movers[i].style.left = movers[i].basicLeft + 100 * phase + 'px';
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
