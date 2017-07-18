@@ -31,13 +31,17 @@ form {
 
 .mover {
   position: fixed;
-  width: 256px;
+  height: 100px;
+  width: 73.333px;
   z-index: -1;
+  will-change: transform;
 }
 
 .randomPizzaContainer {
   float: left;
   display: flex;
+  height: 325px;
+  width: 33.3%;
 }
 
 .randomPizzaContainer:after {
@@ -46,6 +50,30 @@ form {
   clear:both;
 }
 
- .container {
+.container {
   background-color: rgba(240, 60, 60, 0.8);
+}
+
+.pizzaImageContainer {
+  width: 35%;
+}
+
+.pizzaDescription {
+  width: 65%;
+}
+
+.headerCenter {
+  text-align: center;
+}
+
+.smallWidth {
+  width: 25%;
+}
+
+.mediumWidth {
+  width: 33.3%;
+}
+
+.largeWidth {
+  width: 50%;
 }
