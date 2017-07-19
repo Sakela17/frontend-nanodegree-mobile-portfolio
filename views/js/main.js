@@ -506,10 +506,11 @@ function createPizzaBackground() {
     for (var i = 0; i < pizzaCount; i++) {
         elem = document.createElement('img');
         elem.className = 'mover';
-        elem.src = "images/pizza.svg";
+        elem.src = "images/pizza.png";
         elem.basicLeft = (i % cols) * s;
         // console.log(elem.basicLeft);
-        elem.style.transform = "translateX(" + (elem.basicLeft + 100 * Math.sin(i % 5) + 'px') + ")";
+        // elem.style.transform = "translate(" + (elem.basicLeft + 100 * Math.sin(i % 5) + 'px') + ")";
+        elem.style.left = elem.basicLeft + 100 * Math.sin(i % 5) + 'px';
         // elem.basicLeft * Math.sin(bodyPosition + (i % 5)) + 'px';
         // console.log(elem.style.left);
         // console.log(Math.floor(i / cols) * s);
@@ -532,15 +533,18 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  // var bodyPosition = window.pageYOffset;
-  var bodyPosition = window.pageYOffset / 1250;
+  var bodyPosition = document.body.scrollTop /1250;
+  // var bodyPosition = window.pageYOffset / 1250;
   // console.log(document.body.scrollTop);
   // console.log(bodyPosition);
 
+
   for (var i = 0, changePosition, length = movers.length; i < length; i += 1) {
+    var calc = Math.sin(bodyPosition + (i % 5)) * 100;
+    movers[i].style.left = movers[i].basicLeft + calc + 'px';
     // movers[i].style.left = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
-    changePosition = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
-    movers[i].style.transform = "translateX(" + changePosition + ")";
+    // changePosition = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
+    // movers[i].style.transform = "translate(" + changePosition + ")";
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
