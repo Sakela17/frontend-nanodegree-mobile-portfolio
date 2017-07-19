@@ -426,7 +426,8 @@ var resizePizzas = function(size) {
 
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
-    var newWidth;
+    var newWidth,
+        randomPizzas;
 
     switch(size) {
         case "1":
@@ -442,7 +443,7 @@ var resizePizzas = function(size) {
             console.log("bug in sizeSwitcher");
     }
 
-    var randomPizzas = document.getElementsByClassName("randomPizzaContainer");
+    randomPizzas = document.getElementsByClassName("randomPizzaContainer");
 
     for (var i = 0, length = randomPizzas.length; i < length; i += 1) {
       randomPizzas[i].style.width = newWidth + "%";
@@ -460,10 +461,11 @@ var resizePizzas = function(size) {
 
 window.performance.mark("mark_start_generating"); // collect timing data
 
+var pizzasDiv = document.getElementById("randomPizzas");
 // This for-loop actually creates and appends all of the pizzas when the page loads
 for (var i = 2; i < 48; i++) {
-  var pizzasDiv = document.getElementById("randomPizzas");
-  pizzasDiv.appendChild(pizzaElementGenerator(i));
+  var pizzaElement = pizzaElementGenerator(i);
+  pizzasDiv.appendChild(pizzaElement);
 }
 
 // User Timing API again. These measurements tell you how long it took to generate the initial pizzas
@@ -508,14 +510,8 @@ function createPizzaBackground() {
         elem.className = 'mover';
         elem.src = "images/pizza.png";
         elem.basicLeft = (i % cols) * s;
-        // console.log(elem.basicLeft);
-        // elem.style.transform = "translate(" + (elem.basicLeft + 100 * Math.sin(i % 5) + 'px') + ")";
         elem.style.left = elem.basicLeft + 100 * Math.sin(i % 5) + 'px';
-        // elem.basicLeft * Math.sin(bodyPosition + (i % 5)) + 'px';
-        // console.log(elem.style.left);
-        // console.log(Math.floor(i / cols) * s);
         elem.style.top = (Math.floor(i / cols) * s) + 'px';
-        // nodes.push(elem);
         document.querySelector("#movingPizzas1").appendChild(elem);
     }
 }
@@ -524,6 +520,7 @@ createPizzaBackground();
 
 
 var movers = document.getElementsByClassName('mover');
+var moversLength = movers.length;
 
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
@@ -533,18 +530,22 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  var bodyPosition = document.body.scrollTop /1250;
-  // var bodyPosition = window.pageYOffset / 1250;
-  // console.log(document.body.scrollTop);
-  // console.log(bodyPosition);
+  var bodyPosition,
+      phases = [];
 
+  bodyPosition = document.body.scrollTop / 1250;
 
-  for (var i = 0, changePosition, length = movers.length; i < length; i += 1) {
-    var calc = Math.sin(bodyPosition + (i % 5)) * 100;
-    movers[i].style.left = movers[i].basicLeft + calc + 'px';
+  // Calculates 5 values between -1 and 1 based on bodyPosition. Used in calculating background pizzas positions.
+  for (var j = 0; j < 5; j += 1) {
+      phases.push(Math.sin(bodyPosition + (j % 5)) * 100);
+  }
+
+  // Update background pizzas positions.
+  for (var i = 0; i < moversLength; i += 1) {
+     movers[i].style.left = movers[i].basicLeft + phases[(i % 5)] + 'px';
+    // var calcLeftPosition = movers[i].basicLeft + Math.sin(bodyPosition + (i % 5)) * 100;
+    // movers[i].style.left = calcLeftPosition + 'px';
     // movers[i].style.left = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
-    // changePosition = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
-    // movers[i].style.transform = "translate(" + changePosition + ")";
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -557,10 +558,117 @@ function updatePositions() {
   }
 }
 
-// runs updatePositions on scroll
+// Runs updatePositions on scroll at the optimal time for the browser.
   window.addEventListener('scroll', function() {
     requestAnimationFrame(updatePositions);
-  });
+  }, false);
 
-// Generates the sliding pizzas when the page loads.
-// document.addEventListener('DOMContentLoaded', updatePositions);
+
+
+
+
+// var movers = document.getElementsByClassName('mover');
+// var moversLength = movers.length;
+//
+//
+// function updatePositions(yPos) {
+//     frame++;
+//     window.performance.mark("mark_start_frame");
+//
+//     var phases = [];
+//
+//
+//     // Calculates 5 values between -1 and 1 based on bodyPosition. Used in calculating background pizzas positions.
+//     for (var j = 0; j < 5; j += 1) {
+//         phases.push(Math.sin(yPos + (j % 5)) * 100);
+//     }
+//
+//     // Update background pizzas positions.
+//     for (var i = 0; i < moversLength; i += 1) {
+//         movers[i].style.left = movers[i].basicLeft + phases[(i % 5)] + 'px';
+//         // var calcLeftPosition = movers[i].basicLeft + Math.sin(bodyPosition + (i % 5)) * 100;
+//         // movers[i].style.left = calcLeftPosition + 'px';
+//         // movers[i].style.left = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
+//     }
+//
+//     // User Timing API to the rescue again. Seriously, it's worth learning.
+//     // Super easy to create custom metrics.`
+//     window.performance.mark("mark_end_frame");
+//     window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
+//     if (frame % 10 === 0) {
+//         var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
+//         logAverageFrame(timesToUpdatePosition);
+//     }
+// }
+//
+//
+// window.addEventListener("DOMContentLoaded", scrollLoop, false);
+//
+//
+//
+// function scrollLoop() {
+//
+//     var bodyPosition = document.body.scrollTop / 1250;
+//
+//     updatePositions(bodyPosition);
+//
+//     requestAnimationFrame(scrollLoop);
+// }
+
+
+
+//
+// var movers = document.getElementsByClassName('mover');
+// var moversLength = movers.length;
+//
+// window.addEventListener('scroll', onScroll, false);
+//
+// var latestKnownScrollY = 0,
+//     ticking = false;
+//
+// function onScroll() {
+//     latestKnownScrollY = document.body.scrollTop;
+//     requestTick();
+// }
+//
+// function requestTick() {
+//     if(!ticking) {
+//         requestAnimationFrame(updatePositions);
+//     }
+//     ticking = true;
+// }
+//
+// function updatePositions() {
+//     frame++;
+//     window.performance.mark("mark_start_frame");
+//
+//     // reset the tick so we can capture the next onScroll
+//     ticking = false;
+//
+//     var yPos = latestKnownScrollY / 1250;
+//
+//     var phases = [];
+//
+//     // Calculates 5 values between -1 and 1 based on bodyPosition. Used in calculating background pizzas positions.
+//     for (var j = 0; j < 5; j += 1) {
+//         phases.push(Math.sin(yPos + (j % 5)) * 100);
+//     }
+//
+//     // Update background pizzas positions.
+//     for (var i = 0; i < moversLength; i += 1) {
+//         movers[i].style.left = movers[i].basicLeft + phases[(i % 5)] + 'px';
+//         // var calcLeftPosition = movers[i].basicLeft + Math.sin(bodyPosition + (i % 5)) * 100;
+//         // movers[i].style.left = calcLeftPosition + 'px';
+//         // movers[i].style.left = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
+//     }
+//
+//     // User Timing API to the rescue again. Seriously, it's worth learning.
+//     // Super easy to create custom metrics.`
+//     window.performance.mark("mark_end_frame");
+//     window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
+//     if (frame % 10 === 0) {
+//         var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
+//         logAverageFrame(timesToUpdatePosition);
+//     }
+// }
+
