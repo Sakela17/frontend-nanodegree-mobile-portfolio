@@ -1,63 +1,61 @@
 # Website Performance Optimization Project
 
 This is one of the projects for the Front-End Web Developer Nanodegree program at [Udacity](https://www.udacity.com/course/front-end-web-developer-nanodegree--nd001).
-The goal was to optimize a provided website with a number of optimization- and performance-related issues so that it achieves a target PageSpeed score and runs at 60 frames per second.
+The goal was to optimize a provided website with a number of optimization- and performance-related issues so that it achieves above 90 [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/) score and runs at 60 frames per second.
 
-### Part 1: Optimize PageSpeed Insights score for index.html
-At the beginning of the pro
-
-
-
-Your challenge, if you wish to accept it (and we sure hope you will), is to optimize this online portfolio for speed! In particular, optimize the critical rendering path and make this page render as quickly as possible by applying the techniques you've picked up in the [Critical Rendering Path course](https://www.udacity.com/course/ud884).
-
-To get started, check out the repository and inspect the code.
-
-### Getting started
-
-#### Part 1: Optimize PageSpeed Insights score for index.html
-
-Some useful tips to help you get started:
-
-1. Check out the repository
-1. To inspect the site on your phone, you can run a local server
-
-  ```bash
-  $> cd /path/to/your-project-folder
-  $> python -m SimpleHTTPServer 8080
+## Quick Start
+To test working (production) version of the project on [PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/), or to inspect the site on your phone, you need:
+* Check out the repository
+* Install [Node](https://nodejs.org/en/) and [Gulp](https://gulpjs.com/)
+* Run a local server from a terminal:
+ ```
+  $ npm install -g live-server
+  $ cd /path/to/directory/dist
+  $ live-server --port=80
   ```
+* Download and unzip [ngrok](https://ngrok.com/) into project's ```dist``` directory to make your local server accessible remotely.
+* In a new terminal window:
+```
+  $ cd /path/to/directory/dist
+  $ ./ngrok http 80
+```
+* In a web browser open http://localhost:4040/inspect/http and click on one of the links
+* Use provided URL to run it through PageSpeed Insights or to inspect the application on your phone.
 
-1. Open a browser and visit localhost:8080
-1. Download and install [ngrok](https://ngrok.com/) to the top-level of your project directory to make your local server accessible remotely.
+## Optimization Summary
+### Part 1: PageSpeed Score
+This part focused on index.html page. The project requirement was to optimize the Critical Rendering Pathw to achieve PageSpeed Insights score of at least 90 for Mobile and Desktop.
+Before optimization the score was 28 for Mobile and 30 for Desktop.
+The following optimization steps had been taken to take that score above 90:
+1. Refactored CSS file to keep it lean by reducing selector complexity and optimizing the rules.
+2. Minified and inlined CSS - eliminating an extra CSS request helped to speed up CSSOM construction. I felt it was reasonable to do it in this project since there were not a lot of styles applied to the pages. However, for those pages that share one, more complex CSS file, it would make sense to leave the links and utilize browser's caching as well as SoC.
+3. Removed Google fonts and used Arial font size instead (though, this eliminated request to Google Server, I did not notice much of an improvement on DCL speed).
+4. Applied media type to print.css link to unblock page rendering.
+5. Replaced remotely hosted thumbnails with locally hosted versions - this allowed for image optimization.
+6. Resized pizzeria.jpg from 2.3mb to 6kb (99% reduction).
+8. Applied async attribute to Google Analytics to unblock page rendering.
+7. Minified all images with [gulp-image](https://www.npmjs.com/package/gulp-image) task.
+Minified print.css with [gulp-clean-css](https://www.npmjs.com/package/gulp-clean-css) task.
+Minified permatters.js with [gulp-uglify](https://www.npmjs.com/package/gulp-uglify) task.
+Minified index.html with [gulp-htmlmin](https://www.npmjs.com/package/gulp-htmlmin) task.
 
-  ``` bash
-  $> cd /path/to/your-project-folder
-  $> ./ngrok http 8080
-  ```
+### Part 2: Getting Rid of Jank
+This part focused on views/pizza.html page. The project requirements were to optimize views/js/main.js file to make pizza.html page render with a consistent frame-rate at 60fps when scrolling. And, to reduce time down to less than 5 ms that takes to resize pizzas using the pizza size slider.
+The following optimization steps had been taken to meet the project requirements:
+1. Refactored changePizzaSizes() (that is called when user toggles pizza size slider) to eliminate forced synchronous layout (FSL). Now time to resize pizzas takes less than 5ms.
+2. Refactored updatePositions() that caused FSL on scroll.
+3. Replaced 'DOM Content Loaded' listener and its function with createPizzaBackground(). This eliminated FSL on load.
+4. Refactored code to generate amount of background pizzas based on user's viewport.
+5. Replaced pizza.svg with pizza.png reducing file size by 30%.
+6. Micro-optimizations were made to speed up the 'for' loops by minimizing DOM queries, caching the variable, and reducing calculations.
 
-1. Copy the public URL ngrok gives you and try running it through PageSpeed Insights! Optional: [More on integrating ngrok, Grunt and PageSpeed.](http://www.jamescryer.com/2014/06/12/grunt-pagespeed-and-ngrok-locally-testing/)
-
-Profile, optimize, measure... and then lather, rinse, and repeat. Good luck!
-
-#### Part 2: Optimize Frames per Second in pizza.html
-
-To optimize views/pizza.html, you will need to modify views/js/main.js until your frames per second rate is 60 fps or higher. You will find instructive comments in main.js. 
-
-You might find the FPS Counter/HUD Display useful in Chrome developer tools described here: [Chrome Dev Tools tips-and-tricks](https://developer.chrome.com/devtools/docs/tips-and-tricks).
-
-### Optimization Tips and Tricks
-* [Optimizing Performance](https://developers.google.com/web/fundamentals/performance/ "web performance")
-* [Analyzing the Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp.html "analyzing crp")
-* [Optimizing the Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/optimizing-critical-rendering-path.html "optimize the crp!")
-* [Avoiding Rendering Blocking CSS](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css.html "render blocking css")
-* [Optimizing JavaScript](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/adding-interactivity-with-javascript.html "javascript")
-* [Measuring with Navigation Timing](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/measure-crp.html "nav timing api"). We didn't cover the Navigation Timing API in the first two lessons but it's an incredibly useful tool for automated page profiling. I highly recommend reading.
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/eliminate-downloads.html">The fewer the downloads, the better</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer.html">Reduce the size of text</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization.html">Optimize images</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching.html">HTTP caching</a>
-
-### Customization with Bootstrap
-The portfolio was built on Twitter's <a href="http://getbootstrap.com/">Bootstrap</a> framework. All custom styles are in `dist/css/portfolio.css` in the portfolio repo.
-
-* <a href="http://getbootstrap.com/css/">Bootstrap's CSS Classes</a>
-* <a href="http://getbootstrap.com/components/">Bootstrap's Components</a>
+## Editing the Application
+* Clone the repository
+* Install [Node](https://nodejs.org/en/) and [Gulp](https://gulpjs.com/)
+* In a terminal, navigate to this project and install dependencies:
+```
+  $ npm install
+```
+* Make modifications to a code in ```src``` directory (development directory)
+* When done, run ```gulp default``` task in the terminal. This will minify html, css, and js files and update their copies in ```dist``` directory (production directory)
+* You can additionally run ```gulp min-img```. This will optimize images with .jpg, .gif., and .png extensions and save them in ```dist``` directory

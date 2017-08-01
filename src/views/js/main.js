@@ -379,7 +379,7 @@ var pizzaElementGenerator = function(i) {
   // pizzaImageContainer.style.width="35%";
   pizzaImageContainer.classList.add("pizzaImageContainer");
 
-  pizzaImage.src = "images/pizza.svg";
+  pizzaImage.src = "images/pizza.png";
   pizzaImage.classList.add("img-responsive");
   pizzaImageContainer.appendChild(pizzaImage);
   pizzaContainer.appendChild(pizzaImageContainer);
@@ -459,14 +459,18 @@ var resizePizzas = function(size) {
   console.log("Time to resize pizzas: " + timeToResize[timeToResize.length-1].duration + "ms");
 };
 
+// Some argue that, depending on a browser, using Fragment is faster since it doesn't require as many re-flows.
+// When testing in Chrome, I did not notice a difference.
 window.performance.mark("mark_start_generating"); // collect timing data
-
 var pizzasDiv = document.getElementById("randomPizzas");
+var newFrgmnt = document.createDocumentFragment();
 // This for-loop actually creates and appends all of the pizzas when the page loads
-for (var i = 2; i < 48; i++) {
+for (var i = 2; i < 100; i++) {
   var pizzaElement = pizzaElementGenerator(i);
-  pizzasDiv.appendChild(pizzaElement);
+  // pizzasDiv.appendChild(pizzaElement);
+    newFrgmnt.appendChild(pizzaElement);
 }
+pizzasDiv.appendChild(newFrgmnt);
 
 // User Timing API again. These measurements tell you how long it took to generate the initial pizzas
 window.performance.mark("mark_end_generating");
@@ -488,8 +492,7 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
   console.log("Average scripting time to generate last 10 frames: " + sum / 10 + "ms");
 }
 
-
-// Generates background pizza images. The number of images depends on viewport height and width.
+// Creates and appends background pizza images when page loads. The number of images depends on viewport height and width.
 function createPizzaBackground() {
     var height,
         width,
@@ -497,13 +500,14 @@ function createPizzaBackground() {
         cols,
         pizzaCount,
         s = 256,
+        fragment,
         elem;
 
-    height = screen.height;
-    width = screen.width;
+    height = screen.height; // viewport height
+    width = screen.width; // viewport width
     rows = Math.ceil(height / s);
     cols = Math.ceil(width / s);
-    pizzaCount = rows * cols;
+    pizzaCount = rows * cols;  // Calculates number of background pizzas based on the viewport size.
 
     for (var i = 0; i < pizzaCount; i++) {
         elem = document.createElement('img');
@@ -514,16 +518,29 @@ function createPizzaBackground() {
         elem.style.top = (Math.floor(i / cols) * s) + 'px';
         document.querySelector("#movingPizzas1").appendChild(elem);
     }
+
+    // Since the document fragment is in memory and not part of the main DOM tree, appending children to it does not
+    // cause page reflow on each loop. Operations made on the fragment are faster since there's no manipulation
+    // of the DOM. Consequently, it results in better performance. Is it true???
+    // fragment = document.createDocumentFragment();
+    // for (var i = 0; i < pizzaCount; i++) {
+    //     elem = document.createElement('img');
+    //     elem.className = 'mover';
+    //     elem.src = "images/pizza.png";
+    //     elem.basicLeft = (i % cols) * s;
+    //     elem.style.left = elem.basicLeft + 100 * Math.sin(i % 5) + 'px';
+    //     elem.style.top = (Math.floor(i / cols) * s) + 'px';
+    //     fragment.appendChild(elem);
+    //
+    // }
+    // document.getElementById("movingPizzas1").appendChild(fragment);
 }
 
 createPizzaBackground();
 
-
+// Stores all sliding background pizzas in variable
 var movers = document.getElementsByClassName('mover');
 var moversLength = movers.length;
-
-// The following code for sliding background pizzas was pulled from Ilya's demo found at:
-// https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
 // Moves the sliding background pizzas based on scroll position
 function updatePositions() {
@@ -543,9 +560,6 @@ function updatePositions() {
   // Update background pizzas positions.
   for (var i = 0; i < moversLength; i += 1) {
      movers[i].style.left = movers[i].basicLeft + phases[(i % 5)] + 'px';
-    // var calcLeftPosition = movers[i].basicLeft + Math.sin(bodyPosition + (i % 5)) * 100;
-    // movers[i].style.left = calcLeftPosition + 'px';
-    // movers[i].style.left = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -565,58 +579,25 @@ function updatePositions() {
 
 
 
+//************ OPTION 2 **********//
 
-
-// var movers = document.getElementsByClassName('mover');
-// var moversLength = movers.length;
+// var isScrolling = false;
 //
-//
-// function updatePositions(yPos) {
-//     frame++;
-//     window.performance.mark("mark_start_frame");
-//
-//     var phases = [];
-//
-//
-//     // Calculates 5 values between -1 and 1 based on bodyPosition. Used in calculating background pizzas positions.
-//     for (var j = 0; j < 5; j += 1) {
-//         phases.push(Math.sin(yPos + (j % 5)) * 100);
-//     }
-//
-//     // Update background pizzas positions.
-//     for (var i = 0; i < moversLength; i += 1) {
-//         movers[i].style.left = movers[i].basicLeft + phases[(i % 5)] + 'px';
-//         // var calcLeftPosition = movers[i].basicLeft + Math.sin(bodyPosition + (i % 5)) * 100;
-//         // movers[i].style.left = calcLeftPosition + 'px';
-//         // movers[i].style.left = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
-//     }
-//
-//     // User Timing API to the rescue again. Seriously, it's worth learning.
-//     // Super easy to create custom metrics.`
-//     window.performance.mark("mark_end_frame");
-//     window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
-//     if (frame % 10 === 0) {
-//         var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
-//         logAverageFrame(timesToUpdatePosition);
-//     }
-// }
-//
-//
-// window.addEventListener("DOMContentLoaded", scrollLoop, false);
-//
-//
+// window.addEventListener("scroll", scrollLoop, false);
 //
 // function scrollLoop() {
-//
-//     var bodyPosition = document.body.scrollTop / 1250;
-//
-//     updatePositions(bodyPosition);
-//
-//     requestAnimationFrame(scrollLoop);
+//     if (isScrolling == false) {
+//         var bodyPosition = document.body.scrollTop / 1250;
+//         window.requestAnimationFrame(function() {
+//             updatePositions(bodyPosition);
+//             isScrolling = false;
+//         });
+//     }
+//     isScrolling = true;
 // }
 
 
-
+//************ OPTION 3 **********//
 //
 // var movers = document.getElementsByClassName('mover');
 // var moversLength = movers.length;
@@ -657,9 +638,6 @@ function updatePositions() {
 //     // Update background pizzas positions.
 //     for (var i = 0; i < moversLength; i += 1) {
 //         movers[i].style.left = movers[i].basicLeft + phases[(i % 5)] + 'px';
-//         // var calcLeftPosition = movers[i].basicLeft + Math.sin(bodyPosition + (i % 5)) * 100;
-//         // movers[i].style.left = calcLeftPosition + 'px';
-//         // movers[i].style.left = movers[i].basicLeft + 100 * Math.sin(bodyPosition + (i % 5)) + 'px';
 //     }
 //
 //     // User Timing API to the rescue again. Seriously, it's worth learning.

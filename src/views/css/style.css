@@ -30,7 +30,7 @@ form {
 }
 
 .mover {
-  will-change: transform;
+  /*will-change: transform;*/
   position: fixed;
   height: 100px;
   width: 73.333px;
