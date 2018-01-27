@@ -1,13 +1,13 @@
 'use strict';
 
 // Plugins
-var gulp = require('gulp');
-var rename = require("gulp-rename");
-var uglify = require('gulp-uglify');
-var pump = require('pump');
-var htmlmin = require('gulp-htmlmin');
-var cssmin = require('gulp-clean-css');
-var image = require('gulp-image');
+var gulp = require('gulp'),
+    rename = require("gulp-rename"),
+    uglify = require('gulp-uglify'),
+    pump = require('pump'),
+    htmlmin = require('gulp-htmlmin'),
+    cssmin = require('gulp-clean-css'),
+    image = require('gulp-image');
 
 // Minify .html files
 gulp.task('min-html', function() {

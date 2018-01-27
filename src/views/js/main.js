@@ -550,15 +550,19 @@ function updatePositions() {
   var bodyPosition,
       phases = [];
 
-  bodyPosition = document.body.scrollTop / 1250;
+  bodyPosition = window.scrollY / 1250;
 
   // Calculates 5 values between -1 and 1 based on bodyPosition. Used in calculating background pizzas positions.
   for (var j = 0; j < 5; j += 1) {
       phases.push(Math.sin(bodyPosition + (j % 5)) * 100);
   }
 
-  // Update background pizzas positions.
+  // var currentScrollY = window.scrollY;
+
+    // Update background pizzas positions.
   for (var i = 0; i < moversLength; i += 1) {
+     // var phase = Math.sin((currentScrollY / 1250) + (i % 5));
+     // items[i].style.transform = "translateX(" + 100 * phase + "px)"; //animate on translate property - increased performance
      movers[i].style.left = movers[i].basicLeft + phases[(i % 5)] + 'px';
   }
 
@@ -572,11 +576,12 @@ function updatePositions() {
   }
 }
 
-// Runs updatePositions on scroll at the optimal time for the browser.
+// Since scroll events can fire at a high rate, the event handler shouldn't execute computationally expensive operations such as DOM modifications.
+// Instead, it is recommended to throttle the event using requestAnimationFrame (from MDN web docs).
+// Set listener on scroll to run updatePositions() at the optimal time for the browser.
   window.addEventListener('scroll', function() {
     requestAnimationFrame(updatePositions);
   }, false);
-
 
 
 //************ OPTION 2 **********//
