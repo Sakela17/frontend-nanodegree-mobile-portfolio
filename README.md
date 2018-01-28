@@ -40,7 +40,7 @@ Minified permatters.js with [gulp-uglify](https://www.npmjs.com/package/gulp-ugl
 Minified index.html with [gulp-htmlmin](https://www.npmjs.com/package/gulp-htmlmin) task.
 
 ### Part 2: Getting Rid of Jank
-This part focused on [pizza.html](http://sakela17.github.io/frontend-nanodegree-mobile-portfolio/dist/views/pizza.html). The project requirements were to optimize views/js/main.js file to make pizza.html page render with a consistent frame-rate at 60fps when scrolling. And, to reduce time down to less than 5 ms that takes to resize pizzas using the pizza size slider.
+This part focused on [pizza.html](http://sakela17.github.io/frontend-nanodegree-mobile-portfolio/views/pizza.html). The project requirements were to optimize views/js/main.js file to make pizza.html page render with a consistent frame-rate at 60fps when scrolling. And, to reduce time down to less than 5 ms that takes to resize pizzas using the pizza size slider.
 The following optimization steps had been taken to meet the project requirements:
 1. Refactored changePizzaSizes() (that is called when user toggles pizza size slider) to eliminate forced synchronous layout (FSL). Now time to resize pizzas takes less than 5ms.
 2. Refactored updatePositions() that caused FSL on scroll.
